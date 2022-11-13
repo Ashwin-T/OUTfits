@@ -41,10 +41,10 @@ const Analyze = ({weather}) => {
   //                               {name:"Dress", score:0.4}, {name:"Collar", score:0.1}]
 
   // {category: "UnderShirts", clothing: [{name: "T-shirt", score: 0.1}, {name:"Collar", score:0.1}, {name:"Jersey", score:0.1}, {name:"Dress", score:0.3}]},
-  const clothingScoreArr = [
+  const clothingScoreArr = [  
                             {category: "Shirts", clothing: [{name: "Sleeve", score: 0.15}, {name: "Turtleneck", score: 0.35}, {name:"Sweater", score:0.3}, {name: "T-shirt", score: 0.1}, {name:"Collar", score:0.1}, {name:"Jersey", score:0.1}, {name:"Dress", score:0.3}]},
                             {category: "Trousers", clothing: [{name: "Short", score: 0.15}, {name:"Trousers", score:0.3}, {name:"Denim", score:0.25},{name:"Jean", score:0.25},{name:"Pant", score:0.3},{name:"Sportswear", score:0.3}]},
-                            {category: "Jacket", clothing: [{name:"Vest", score:0.3}, {name:"Jacket", score:0.5},{name:"Leather Jacket", score:0.5}, {name:"Coat", score:0.7}, {name:"Robe", score:0.53}]},
+                            {category: "Jacket", clothing: [{name:"Vest", score:0.3}, {name:"Jacket", score:0.4},{name:"Leather jacket", score:0.35}, {name:"Coat", score:0.7}, {name:"Robe", score:0.53}]},
                             {category: "Shoes", clothing: [{name:"Boots", score:0.1}, {name:"Shoes", score:0.04}, {name:"Slippers", score:0.02}, {name:"Sandals", score:0.02}]},
                             {category: "Accessories", clothing: [{name:"Hat", score:0.1}, {name:"Cap", score:0.1}, {name:"Hood", score: 0.1}]}]
   useEffect(() => {
@@ -93,6 +93,7 @@ const Analyze = ({weather}) => {
     let shoes = false;
     let trousers = [];
     let shirt = [];
+    let jacket = [];
 
     let clothingScore = 0;
     const totalCloScore = (70-((weather.main.temp - 273.15) * 9/5 + 32))*0.01277 + 1
@@ -104,6 +105,7 @@ const Analyze = ({weather}) => {
         for (var j = 0; j < clothingScoreArr[i].clothing.length; j++) {
           if(clothingScoreArr[i].clothing[j].name.toLowerCase().includes(clothingItems[x].description.toLowerCase())||
             clothingItems[x].description.toLowerCase().includes(clothingScoreArr[i].clothing[j].name.toLowerCase())){
+
               if(clothingScoreArr[i].category === "Shoes"){
                 shoes = true;
               }
@@ -113,8 +115,11 @@ const Analyze = ({weather}) => {
                 shirt.push(clothingScoreArr[i].clothing[j].score)
               }
               else{
+                if(clothingScoreArr[i].category === "Jacket"){
+                  jacket.push(clothingScoreArr[i].clothing[j].name);
+                }
                 if(count>0)
-                  total+=clothingScoreArr[i].clothing[j].score*(0.5*count);
+                  total+=clothingScoreArr[i].clothing[j].score*(0.25*count);
                 else
                   total+=clothingScoreArr[i].clothing[j].score;
                 count++;
@@ -131,7 +136,6 @@ const Analyze = ({weather}) => {
         biggest = trousers[i];
       }
     }
-    console.log(biggest)
     clothingScore+=biggest;
 
 
@@ -141,7 +145,6 @@ const Analyze = ({weather}) => {
         biggest = shirt[i];
       }
     }
-    console.log(biggest)
 
     clothingScore+=biggest;
 
@@ -152,6 +155,9 @@ const Analyze = ({weather}) => {
     else
       clothingScore += 0.04 + 0.04 + 0.02;
 
+    if(jacket.includes("Leather jacket") && jacket.includes("Jacket")){
+      clothingScore -= 0.15;
+    }
 
     let readinessPercentage = Math.round((clothingScore/totalCloScore)*100);
     
@@ -189,7 +195,6 @@ const Analyze = ({weather}) => {
     await getDownloadURL(picStorageRef).then(async(url) => {
       setImageAsURL(url)
       const googleAPIResult = await callGoogleVisionApi(url)
-      console.log(googleAPIResult.responses[0].labelAnnotations)
       const handleScoringArrayFirstFilter =  googleAPIResult.responses[0].labelAnnotations.filter((item) => (clothingCheckArray.includes(item.description.toLowerCase())||item.description.toLowerCase().includes(clothingCheckArray)))
       const handleScoringArraySecondFilter = handleScoringArrayFirstFilter.filter((item) => item.score > 0.65)
       setClothingItems(handleScoringArraySecondFilter)
@@ -234,7 +239,7 @@ const callGoogleVisionApi = async (imageURL) => {
     
     setLoading(true)
 
-    const bgRemoveAPI_KEY = "ffYmCMHuw9tavwa4JwMxgqbZ"
+    const bgRemoveAPI_KEY = "hLbcyuxQcdvE5RQNZ268tKNm"
     const image = e.target.files[0]
 
     const resizedImage = await loadImage(image, {
