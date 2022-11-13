@@ -1,15 +1,16 @@
 .loading{
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100vw !important;
-  height: 100vh !important;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
-.loading div{
-  -webkit-animation:spin 4s linear infinite;
-  -moz-animation:spin 4s linear infinite;
-  animation:spin 4s linear infinite;
+.loading:nth-child(1){
+  -webkit-animation:spin 1s linear infinite;
+  -moz-animation:spin 1s linear infinite;
+  animation:spin 1s linear infinite;
 }
 
 

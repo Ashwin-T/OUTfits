@@ -40,12 +40,13 @@ const Analyze = ({weather}) => {
   //                               {name:"Jersey", score:0.1}, {name:"Denim", score:0.3},
   //                               {name:"Dress", score:0.4}, {name:"Collar", score:0.1}]
 
-  const clothingScoreArr = [{category: "UnderShirts", clothing: [{name: "T-shirt", score: 0.1}, {name:"Collar", score:0.1}, {name:"Jersey", score:0.1}, {name:"Dress", score:0.3}]},
-                            {category: "Shirts", clothing: [{name: "Sleeve", score: 0.2}, {name: "Turtleneck", score: 0.35}, {name:"Sweater", score:0.3}]},
-                            {category: "Trousers", clothing: [{name: "Short", score: 0.15}, {name:"Trousers", score:0.3}, {name:"Denim", score:0.25},{name:"Jean", score:0.25},{name:"Pant", score:0.3},{name:"Sportswear", score:0.28}]},
-                            {category: "Jacket", clothing: [{name:"Vest", score:0.3}, {name:"Jacket", score:0.5}, {name:"Coat", score:0.7}, {name:"Robe", score:0.53}]},
-                            {category: "Shoes", clothing: [{name:"Boots", score:0.1}, {name:"Shoes", score:0.04}, {name:"Slippers", score:0.02}, {name:"Sandals", score:0.02}]}]
-
+  // {category: "UnderShirts", clothing: [{name: "T-shirt", score: 0.1}, {name:"Collar", score:0.1}, {name:"Jersey", score:0.1}, {name:"Dress", score:0.3}]},
+  const clothingScoreArr = [
+                            {category: "Shirts", clothing: [{name: "Sleeve", score: 0.15}, {name: "Turtleneck", score: 0.35}, {name:"Sweater", score:0.3}, {name: "T-shirt", score: 0.1}, {name:"Collar", score:0.1}, {name:"Jersey", score:0.1}, {name:"Dress", score:0.3}]},
+                            {category: "Trousers", clothing: [{name: "Short", score: 0.15}, {name:"Trousers", score:0.3}, {name:"Denim", score:0.25},{name:"Jean", score:0.25},{name:"Pant", score:0.3},{name:"Sportswear", score:0.3}]},
+                            {category: "Jacket", clothing: [{name:"Vest", score:0.3}, {name:"Jacket", score:0.5},{name:"Leather Jacket", score:0.5}, {name:"Coat", score:0.7}, {name:"Robe", score:0.53}]},
+                            {category: "Shoes", clothing: [{name:"Boots", score:0.1}, {name:"Shoes", score:0.04}, {name:"Slippers", score:0.02}, {name:"Sandals", score:0.02}]},
+                            {category: "Accessories", clothing: [{name:"Hat", score:0.1}, {name:"Cap", score:0.1}, {name:"Hood", score: 0.1}]}]
   useEffect(() => {
 
     let tempArray = []
@@ -78,7 +79,6 @@ const Analyze = ({weather}) => {
         user: getAuth().currentUser.uid,
         image: imageAsURL,
       }).then(() => {
-        console.log("Document successfully written!");
         reset()
         setLoading(false)
       })
@@ -92,6 +92,7 @@ const Analyze = ({weather}) => {
     setLoadingMessage("Analyzing Your Outfit")
     let shoes = false;
     let trousers = [];
+    let shirt = [];
 
     let clothingScore = 0;
     const totalCloScore = (70-((weather.main.temp - 273.15) * 9/5 + 32))*0.01277 + 1
@@ -107,8 +108,9 @@ const Analyze = ({weather}) => {
                 shoes = true;
               }
               if(clothingScoreArr[i].category === "Trousers"){
-                console.log(clothingScoreArr[i].clothing[j].score)
                 trousers.push(clothingScoreArr[i].clothing[j].score)
+              }else if(clothingScoreArr[i].category === "Shirts"){
+                shirt.push(clothingScoreArr[i].clothing[j].score)
               }
               else{
                 if(count>0)
@@ -116,7 +118,6 @@ const Analyze = ({weather}) => {
                 else
                   total+=clothingScoreArr[i].clothing[j].score;
                 count++;
-                console.log(clothingScoreArr[i].clothing[j].name)
               }
           }
         }
@@ -130,6 +131,18 @@ const Analyze = ({weather}) => {
         biggest = trousers[i];
       }
     }
+    console.log(biggest)
+    clothingScore+=biggest;
+
+
+    biggest = 0;
+    for(var i = 0; i < shirt.length; i++){
+      if(shirt[i]>biggest){
+        biggest = shirt[i];
+      }
+    }
+    console.log(biggest)
+
     clothingScore+=biggest;
 
 
@@ -142,7 +155,6 @@ const Analyze = ({weather}) => {
 
     let readinessPercentage = Math.round((clothingScore/totalCloScore)*100);
     
-    console.log(readinessPercentage);
 
     if(readinessPercentage > 100){
       setMessage("You need to take off some clothes!")
@@ -179,7 +191,7 @@ const Analyze = ({weather}) => {
       const googleAPIResult = await callGoogleVisionApi(url)
       console.log(googleAPIResult.responses[0].labelAnnotations)
       const handleScoringArrayFirstFilter =  googleAPIResult.responses[0].labelAnnotations.filter((item) => (clothingCheckArray.includes(item.description.toLowerCase())||item.description.toLowerCase().includes(clothingCheckArray)))
-      const handleScoringArraySecondFilter = handleScoringArrayFirstFilter.filter((item) => item.score > 0.75)
+      const handleScoringArraySecondFilter = handleScoringArrayFirstFilter.filter((item) => item.score > 0.65)
       setClothingItems(handleScoringArraySecondFilter)
       handleScoring(handleScoringArraySecondFilter)
 

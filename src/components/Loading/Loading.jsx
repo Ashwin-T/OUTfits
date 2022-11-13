@@ -4,9 +4,7 @@ import './loading.css'
 const Loading = ({message}) => {
   return(
     <div className="loading">
-      <div>
-        <AiOutlineLoading size = {150}/>
-      </div>
+      <AiOutlineLoading size = {150}/>
       <h2>{message}</h2>
     </div>
   )

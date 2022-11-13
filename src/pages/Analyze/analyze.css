@@ -57,7 +57,6 @@
 }
 
 
-
 .addBox input{
   display: none;
 }
@@ -68,6 +67,7 @@
   align-items: center;
   width: calc(100% - 1rem);
   margin-top: 1rem !important;
+  margin-bottom: 10rem;
 }
 
 .button-collection button{
