@@ -1,0 +1,37 @@
+.gallery .images{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+}
+
+.gallery h1{
+  font-size: 2rem;
+  margin: 1rem;
+  text-align: center;
+}
+
+
+.selectedImage{
+  width: 100%;
+  margin-top: 5rem;
+}
+
+
+.cancel{
+  position: absolute;
+  top: 0;
+  left: 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: red;
+  z-index: 10;
+}
+
+.gallery .images img{
+  width: calc(45% - 1rem);
+  margin: 0.5rem;
+  background-color: var(--other-color);
+  border-radius: 1rem;
+}

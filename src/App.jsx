@@ -1,33 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useEffect, useState } from "react"
+import Login from "./pages/Login/Login"
+import AppRoutes from "./pages/AppRoutes"
 
-function App() {
-  const [count, setCount] = useState(0)
+import {app} from './Firebase'
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import Loading from "./Components/Loading/Loading"
+
+const App = () => {
+  const auth = getAuth(app)
+
+  const [weaterData, setWeaterData] = useState(null)
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
+  const [location, setLocation] = useState({
+    lat: 0,
+    lon: 0,
+  })
+
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLoading(true)
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsUserLoggedIn(true)
+        setLoading(false)
+      } else {
+        setIsUserLoggedIn(false)
+        setLoading(false)
+
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    //here
+    const getLocation = () => {
+      if (!navigator.geolocation) {
+      } else {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({
+            lat: latitude,
+            lon: longitude
+          })
+        }, () => {
+        });
+      }
+
+    }
+
+    getLocation()
+
+  }, [])
+
+  useEffect(() => {
+    if(location.lat !== 0 && location.lon !== 0){
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lon}&appid=88d2efcaea28f04722ae5374cd196f84`)
+      .then(response => response.json())
+      .then(data => {
+        setWeaterData(data)
+      })
+    }
+  }, [location])
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <>
+      {
+        loading ? <Loading /> : isUserLoggedIn ? <AppRoutes weather = {weaterData} location = {location} /> : <Login setIsUserLoggedIn = {setIsUserLoggedIn}/>
+      }
+    </>
   )
 }
 

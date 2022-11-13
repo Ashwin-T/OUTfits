@@ -1,0 +1,19 @@
+@media screen and (max-width: 768px) {
+  .mobile-nav{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    border-top: 2px solid rgb(213, 213, 213);
+    background-color: var( --other-color);
+
+  }
+
+  .mobile-nav a {
+    margin: 0.5rem 0;
+  }
+
+}
